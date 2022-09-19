@@ -67,10 +67,13 @@ if cam.isOpened():
             if handsData[4][i] == True and handsData[2][i] == True and handsData[3][i] == True:
                 xPx,yPx = recogniser.toPixelCoord(frame.shape, handsData[1][i])
                 matchedPick = tools.pickTool(frame.shape[1] - xPx, yPx)
+                
+                
                 if matchedPick[0]:
                 #ONLY A DEMO, DOES NOT INCLUDES ALL CONFIGUARTIONS OR OPTIONS
-                    tools.setToolsImg(False, matchedPick[1])
-                    print("caange mode tool")
+                    tools.setToolsImg(painter.getEraserMode(), matchedPick[1])
+                    painter.setMode(matchedPick[1])
+
                 if matchedPick[2]:
                     fM = FileManager.FileManager()
                     
@@ -81,6 +84,16 @@ if cam.isOpened():
                     elif matchedPick[1] == 6: #as a text
                     #save img
                         print("SAVING IMAGE IN MODE: ", str(matchedPick[1]))
+                    time.sleep(2)
+
+                if painter.getColorMode():
+                    colorId = tools.pickColorPallete(frame.shape[1] - xPx, yPx, painter.current_color)
+                    painter.changeColor(colorId)
+                elif painter.getSizeMode():
+                    sizeId = tools.pickSizeBar(frame.shape[1] - xPx, yPx, painter.brush_size)
+                    painter.changeSize(sizeId)
+                            
+
         frame = addImages(frame, tools.getToolsImgFlipped()) 
 
         #hands

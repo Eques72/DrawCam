@@ -7,8 +7,15 @@ class ToolsInterface:
     __defaultWidth = 1748
     __defaultHeigth = 1240
     __defaultStripHeight = 183
-    __defaulticonSpacing = [(8,177),(196,365),(375,544),(555,724),(1105,1304),(1329,1513),(1537,17320)]
+    __defaultIconSpacing = [(8,177),(196,365),(375,544),(555,724),(1105,1304),(1329,1513),(1537,17320)]
     __numberOfIcons = 7
+    __numberOfSizes = 3
+    __numberOfColors = 10
+
+    __defaultSizeSpacing = [(34,394),(416,776),(800,1160)]
+    __defaultSizeBarHeigth = 180
+    __defaultColorPalleteSpacing = [20,110,10] #First param - distance from left border, Second - width of one color option, Third - space between colors in the pallete
+    __defaultColorPalleteHeigth = 124
 
     def __init__(self) -> None:
         self.interfaceImgIndex = 0
@@ -22,7 +29,11 @@ class ToolsInterface:
         self.width = ToolsInterface.__defaultWidth
         self.height = ToolsInterface.__defaultHeigth
         self.stripHeight = ToolsInterface.__defaultStripHeight
-        self.iconSpacing = ToolsInterface.__defaulticonSpacing
+        self.iconSpacing = ToolsInterface.__defaultIconSpacing
+        self.sizeBarSpacing = ToolsInterface.__defaultSizeSpacing
+        self.sizeBarHeigth = ToolsInterface.__defaultSizeBarHeigth
+        self.colorPaletteSpacing = ToolsInterface.__defaultColorPalleteSpacing
+        self.colorPalleteHeigth = ToolsInterface.__defaultStripHeight
 
     def adjustToCamSize(self, width, height) -> None:
         for i in range(0,len(self.resourcesListImg)): 
@@ -32,6 +43,8 @@ class ToolsInterface:
         self.width = w
         self.height = h
         self.stripHeight = (int)((h/ToolsInterface.__defaultHeigth) * self.stripHeight)
+        self.sizeBarHeigth = (int)((h/ToolsInterface.__defaultHeigth) * self.sizeBarHeigth)
+        self.colorPalleteHeigth = (int)((h/ToolsInterface.__defaultHeigth) * self.colorPalleteHeigth)
 
         for i in range(0,len(self.resourcesListImg)): 
             he,wi,ch = self.resourcesListImg[i].shape
@@ -42,10 +55,18 @@ class ToolsInterface:
         for i in range(0,ToolsInterface.__numberOfIcons):
             self.iconSpacing[i] = ((int)(self.iconSpacing[i][0]*wProp),(int)(self.iconSpacing[i][1]*wProp))
 
+        self.colorPaletteSpacing[0] = (int)(self.colorPaletteSpacing[0]*wProp)
+        self.colorPaletteSpacing[1] = (int)(self.colorPaletteSpacing[1]*wProp)
+        self.colorPaletteSpacing[2] = (int)(self.colorPaletteSpacing[2]*wProp)
+
+        for i in range(0,ToolsInterface.__numberOfSizes):
+                self.sizeBarSpacing[i] = ((int)(self.sizeBarSpacing[i][0]*wProp),(int)(self.sizeBarSpacing[i][1]*wProp))
+
+
     def setToolsImg(self, is_eraser_active = False, icon_id = 0) -> None:
         if icon_id == 0 or icon_id > 3:
             self.interfaceImgIndex = 0
-        elif icon_id == 1:
+        elif icon_id == 1 and is_eraser_active == False:
                 self.interfaceImgIndex = 1
         elif icon_id == 2:
             if is_eraser_active == True:
@@ -83,13 +104,6 @@ class ToolsInterface:
             saving = True
         return (matching, icon_choosen, saving)
 
-    def pickColor(self, x,y):
-        
-        pass
-    
-    def pickSize(self, x,y):
-        pass
-
     def getToolsImg(self) -> cv2.Mat:
         return self.resourcesListImg[self.interfaceImgIndex]
 
@@ -98,3 +112,33 @@ class ToolsInterface:
 
     def getStripSize(self) -> Tuple:
         return (self.width,self.stripHeight)
+
+    def pickColorPallete(self, x, y, currenColorId):
+        matching = False
+        color_Id_choosen = currenColorId
+        iteration = 0
+        if y <= self.stripHeight + self.colorPalleteHeigth and y > self.stripHeight: 
+            while matching == False and iteration < self.__numberOfColors:
+                if (x > self.colorPaletteSpacing[0] + iteration*(self.colorPaletteSpacing[1]+self.colorPaletteSpacing[2]) and
+                x <=  self.colorPaletteSpacing[0] + iteration*(self.colorPaletteSpacing[1]+self.colorPaletteSpacing[2]) + self.colorPaletteSpacing[1]):
+                    matching = True
+                    color_Id_choosen = iteration
+                else:
+                    iteration += 1 
+
+        return color_Id_choosen
+
+    def pickSizeBar(self ,x,y, currentSizeId):
+        matching = False
+        size_Id_choosen = currentSizeId
+        iteration = 0
+        if y <= self.stripHeight + self.sizeBarHeigth and y > self.stripHeight: 
+            while matching == False and iteration < self.__numberOfSizes:
+                if x > self.sizeBarSpacing[iteration][0] and x <=  self.sizeBarSpacing[iteration][1]:
+                    matching = True
+                    size_Id_choosen = iteration
+                else:
+                    iteration += 1 
+
+        return size_Id_choosen
+        pass

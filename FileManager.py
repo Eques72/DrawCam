@@ -10,25 +10,25 @@ class FileManager:
     def __init__(self) -> None:
         pass
 
-    def saveAsImg(self, image, isCamBacgroundOn = False, variantPath: str = "", fileName = "NewPainting1"):
+    def saveAsImg(self, image, isCamBacgroundOn = False, variantPath: str = "", fileName = "NewPainting1.png"):
         if False == os.path.isdir(FileManager.__savedImagesPath):
             self.__createDir("",FileManager.__savedImagesPath)
         
         takenFileNames = os.listdir(FileManager.__savedImagesPath)
         if isCamBacgroundOn == False:
-            fileName = "NewPaintingTransp1"
+            fileName = "NewPaintingTransp1.png"
         while fileName in takenFileNames:
-            if fileName[len(fileName)-1].isdigit():
-                index = int(fileName[len(fileName)-1])
+            if fileName[len(fileName)-5].isdigit():
+                index = int(fileName[len(fileName)-5])
                 index += 1
-                fileName = fileName[:len(fileName)-2] + str(index)
+                fileName = fileName[:len(fileName)-5] + str(index) + fileName[len(fileName)-4:]
             else:
                 fileName = fileName + "1"
 
         if variantPath == "":
-            cv2.imwrite(FileManager.__savedImagesPath + "/" + fileName + ".png", image)
+            cv2.imwrite(FileManager.__savedImagesPath + "/" + fileName, image)
         else:
-            cv2.imwrite(variantPath + "/" + fileName + ".png", image)
+            cv2.imwrite(variantPath + "/" + fileName, image)
         pass
 
 

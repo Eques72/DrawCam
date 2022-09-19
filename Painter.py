@@ -2,26 +2,27 @@ import cv2
 
 class Painter:
     __brush_sizes = [3,9,15]
-    __colors = [(26,26,26,255),(255,255,255,255),(255,22,22,255),(0,128,55,255),(82,113,255,255),(255,222,89,255),(203,108,230,255),(114,55,38,255),(255,145,77,255),(126,217,87,255)]
-    __eraser = (0,0,0,0)
+    __colors = [(26,26,26,255),(255,255,255,255),(255,22,22,255),(0,128,55,255),(82,113,255,255),(255,222,89,255),(203,108,230,255),(114,55,38,255),(255,145,77,255),(126,217,87,255),(0,0,0,0)]
+    __eraserId = 10
 
 
     def __init__(self) -> None:
         self.brush_size = Painter.__brush_sizes[1]
         self.last_xy = None 
-        self.current_color = Painter.__colors[0]
+        self.current_color = 0
+        self.lastUsedColor = 0
 
-        self.ERASER_MODE = 0
-        self.PAINT_MODE = 1
-        self.COLOR_PICKER_ON = 0
-        self.SIZE_PICKER_ON = 0
+        self.__ERASER_MODE = False
+        self.__PAINT_MODE = True
+        self.__COLOR_PICKER_ON = False
+        self.__SIZE_PICKER_ON = False
         pass
 
     def paint(self, xy, image):
         if self.last_xy is None:
-            image = cv2.circle(image, xy, self.brush_size, self.current_color, -1)
+            image = cv2.circle(image, xy, self.brush_size, Painter.__colors[self.current_color], -1)
         else:
-            image = cv2.line(image, self.last_xy, xy, self.current_color, self.brush_size) 
+            image = cv2.line(image, self.last_xy, xy, Painter.__colors[self.current_color], self.brush_size) 
         self.last_xy = xy
         return image
 
@@ -30,8 +31,9 @@ class Painter:
         pass
 
     def changeColor(self, color_id = 0):
+        self.lastUsedColor = self.current_color
         if color_id < 10 and color_id >= 0:
-            self.current_color = Painter.__colors[color_id]
+            self.current_color = color_id
         pass
 
     def changeSize(self, size_id = 0):
@@ -42,3 +44,47 @@ class Painter:
     def addMonocoloredBackground(color, canvas):
         #TODO ?
         return canvas
+
+    def setMode(self, mode: int):
+        if mode == 0:
+            self.current_color = self.lastUsedColor
+            self.__ERASER_MODE = False
+            self.__PAINT_MODE = True
+            self.__COLOR_PICKER_ON = False
+            self.__SIZE_PICKER_ON = False
+        elif mode == 1 and self.__PAINT_MODE == True:
+            self.__ERASER_MODE = False
+            self.__PAINT_MODE = True
+            self.__COLOR_PICKER_ON = True
+            self.__SIZE_PICKER_ON = False            
+        elif mode == 2 and self.__PAINT_MODE == True:
+            self.__ERASER_MODE = False
+            self.__PAINT_MODE = True
+            self.__COLOR_PICKER_ON = False
+            self.__SIZE_PICKER_ON = True            
+        elif mode == 2 and self.__ERASER_MODE == True:
+            self.__ERASER_MODE = True
+            self.__PAINT_MODE = False
+            self.__COLOR_PICKER_ON = False
+            self.__SIZE_PICKER_ON = True                   
+        elif mode == 3:
+            if self.current_color != Painter.__eraserId:
+                self.lastUsedColor = self.current_color
+            self.current_color = Painter.__eraserId
+            self.__ERASER_MODE = True
+            self.__PAINT_MODE = False
+            self.__COLOR_PICKER_ON = False
+            self.__SIZE_PICKER_ON = False        
+        pass
+
+    def getEraserMode(self):
+        return self.__ERASER_MODE
+
+    def getPainterMode(self):
+        return self.__PAINT_MODE
+
+    def getColorMode(self):
+        return self.__COLOR_PICKER_ON
+
+    def getSizeMode(self):
+        return self.__SIZE_PICKER_ON
