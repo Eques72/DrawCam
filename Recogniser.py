@@ -95,11 +95,14 @@ class Recogniser:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         return img
 
-    def paintMarkers(self, enLmList, img):
+    def paintMarkers(self, enLmList, img, fingerTipColor):
+        colorTip = Recogniser.__topMarkerColor
+        if fingerTipColor is not None:
+            colorTip = fingerTipColor
         for i in range(0, len(enLmList)):
             if i in Recogniser.__visibleLandmarksIds:
                 if i in Recogniser.__topMarkersIds:
-                    img = cv2.circle(img, self.toPixelCoord(img.shape, enLmList[i]), Recogniser.__topMarkerSize, Recogniser.__topMarkerColor, -1) 
+                    img = cv2.circle(img, self.toPixelCoord(img.shape, enLmList[i]), Recogniser.__topMarkerSize, colorTip, -1) 
                 else:
                     img = cv2.circle(img, self.toPixelCoord(img.shape, enLmList[i]), Recogniser.__markerSize, Recogniser.__markerColor, -1) 
         # for id, lm in enLmList:

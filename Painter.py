@@ -2,9 +2,9 @@ import cv2
 
 class Painter:
     __brush_sizes = [3,9,15]
-    __colors = [(26,26,26,255),(255,255,255,255),(255,22,22,255),(0,128,55,255),(82,113,255,255),(255,222,89,255),(203,108,230,255),(114,55,38,255),(255,145,77,255),(126,217,87,255),(0,0,0,0)]
+    __colors = [(26,26,26,255),(255,255,255,255),(22,22,255,255),(55,128,0,255),(255,113,82,255),
+    (89,222,225,255),(230,108,203,255),(38,55,114,255),(77,145,255,255),(87,217,126,255),(0,0,0,0)] #BGR
     __eraserId = 10
-
 
     def __init__(self) -> None:
         self.brush_size = Painter.__brush_sizes[1]
@@ -88,3 +88,9 @@ class Painter:
 
     def getSizeMode(self):
         return self.__SIZE_PICKER_ON
+
+    def getCurrentColor(self):
+        return Painter.__colors[self.current_color]
+
+    def getCurrentColorId(self):
+        return self.current_color
