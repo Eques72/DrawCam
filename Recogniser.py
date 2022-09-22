@@ -26,12 +26,12 @@ class Recogniser:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.mp_hands = mp.solutions.hands
-        
+        self.num_of_hands = 1
 
         self.hands = self.mp_hands.Hands( static_image_mode=False, model_complexity=Recogniser.__model_complexity,
             min_detection_confidence=Recogniser.__min_detection_confidence,
             min_tracking_confidence=Recogniser.__min_tracking_confidence, 
-            max_num_hands=Recogniser.__max_num_hands)
+            max_num_hands=self.num_of_hands)
         pass
 
     def recogniseHandsOnImg(self, image):
@@ -95,14 +95,17 @@ class Recogniser:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         return img
 
-    def paintMarkers(self, enLmList, img, fingerTipColor):
+    def paintMarkers(self, enLmList, img, fingerTipColor, fingerTipSize):
         colorTip = Recogniser.__topMarkerColor
+        sizeTip = Recogniser.__topMarkerSize
         if fingerTipColor is not None:
             colorTip = fingerTipColor
+        if fingerTipSize is not None:
+            sizeTip = fingerTipSize    
         for i in range(0, len(enLmList)):
             if i in Recogniser.__visibleLandmarksIds:
                 if i in Recogniser.__topMarkersIds:
-                    img = cv2.circle(img, self.toPixelCoord(img.shape, enLmList[i]), Recogniser.__topMarkerSize, colorTip, -1) 
+                    img = cv2.circle(img, self.toPixelCoord(img.shape, enLmList[i]), sizeTip, colorTip, -1) 
                 else:
                     img = cv2.circle(img, self.toPixelCoord(img.shape, enLmList[i]), Recogniser.__markerSize, Recogniser.__markerColor, -1) 
         # for id, lm in enLmList:
@@ -135,3 +138,12 @@ class Recogniser:
         y_pos=(int)(lm.y*imgShape[0])
         x_pos=(int)(imgShape[1]*lm.x)
         return x_pos,y_pos
+
+    def changeModel(self, new_number_of_hands:int = 1):
+        if new_number_of_hands != self.num_of_hands:
+            self.num_of_hands = new_number_of_hands
+            self.hands = self.mp_hands.Hands( static_image_mode=False, model_complexity=Recogniser.__model_complexity,
+                min_detection_confidence=Recogniser.__min_detection_confidence,
+                min_tracking_confidence=Recogniser.__min_tracking_confidence, 
+                max_num_hands=new_number_of_hands)
+        pass

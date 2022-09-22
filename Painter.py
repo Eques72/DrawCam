@@ -91,6 +91,9 @@ class Painter:
 
     def getCurrentColor(self):
         return Painter.__colors[self.current_color]
+    
+    def getCurrentSize(self):
+        return self.brush_size
 
     def getCurrentColorId(self):
         return self.current_color

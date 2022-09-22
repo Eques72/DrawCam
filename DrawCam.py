@@ -18,6 +18,9 @@ class DrawCam:
         self.tools = ToolsInterface.ToolsInterface()
 
         self.tools.adjustToCamSize(self.camera.read()[1].shape[1],self.camera.read()[1].shape[0])
+
+        self.is_fps_counter_on = False
+        self.fpsC = FPScounter()
         pass
 
     def __setCanvas(self, parentImg):
@@ -57,7 +60,7 @@ class DrawCam:
         elif saveMode == 6: #as a text
             #TODO save img
             print("SAVING IMAGE IN MODE: ", str(saveMode))
-            time.sleep(2)      
+        time.sleep(2)      
         pass  
 
     def __handlePaletteSelections(self, X,Y, frame):
@@ -74,12 +77,21 @@ class DrawCam:
             if handsData[4][i] == True and handsData[2][i] == True and handsData[3][i] == True:
                 xPx,yPx = self.recogniser.toPixelCoord(frame.shape, handsData[1][i])
                 matchedPick = self.tools.pickTool(frame.shape[1] - xPx, yPx)
-                                                        
-                if matchedPick[0]:
+                
+                if matchedPick[0]:                              
                     self.tools.setToolsImg(self.painter.getEraserMode(), matchedPick[1])
                     self.painter.setMode(matchedPick[1])
-                if matchedPick[2]:
-                    self.__wrapSaveProcedure(matchedPick[1], frame, self.canvas)
+                    if matchedPick[2]:
+                        self.__wrapSaveProcedure(matchedPick[1], frame, self.canvas)
+
+                if self.tools.getToolsMode() >= 5:
+                    settings = self.tools.pickSettings(frame.shape[1] - xPx, yPx)
+                    if settings[0]:
+                        self.recogniser.changeModel(2)
+                    else:
+                        self.recogniser.changeModel(1)
+                    self.is_fps_counter_on = settings[1]
+                    self.tools.setToolsImg(self.painter.getEraserMode(), 7)                                                    
 
                 self.__handlePaletteSelections(xPx, yPx, frame)
         pass
@@ -101,9 +113,13 @@ class DrawCam:
                 frame = self.__superimposeImages(frame, self.tools.getToolsImgFlipped()) 
 
                 for i in range(0, handsData[0]):
-                    frame = self.recogniser.paintMarkers(handsData[5][i], frame, self.painter.getCurrentColor())
+                    frame = self.recogniser.paintMarkers(handsData[5][i], frame, self.painter.getCurrentColor(), self.painter.getCurrentSize())
 
                 frame = cv2.flip(frame, 1)
+                
+                if self.is_fps_counter_on:
+                    frame = self.fpsC.displayFPS(frame)
+
                 cv2.imshow("DRAW-CAM", frame)
 
         self.camera.release()
@@ -115,18 +131,18 @@ class FPScounter:
         self.time_stamp_now = time.time()
         pass
     
-    def getFPS(self):
+    def __getFPS(self):
         self.time_stamp_now = time.time()
-        fps, self.time_stamp_start = self.countFPS(self.time_stamp_now, self.time_stamp_start)
+        fps, self.time_stamp_start = self.__countFPS(self.time_stamp_now, self.time_stamp_start)
         return fps
 
     def displayFPS(self, image):
-        fpsNum = self.getFPS()
+        fpsNum = self.__getFPS()
         image = cv2.putText(image, str(fpsNum), (0, image.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX, 3, 
              (94, 10, 2), 8, cv2.LINE_AA, False)
         return image
 
-    def countFPS(t1, t2):
+    def __countFPS(self, t1, t2):
         a = (int) (1/(t1 - t2))
         t2 = t1    
         return a, t2
