@@ -21,6 +21,10 @@ class ToolsInterface:
     __defaultSettingSpacing = [(560,700),(768,1030),(1054,1240) ]
     __defaultSettingsHeight = 180
 
+    __defaultSaveSpacing = []
+    __defaultSaveHeigth = 0
+
+
     def __init__(self) -> None:
         self.interfaceImgIndex = 0
         
@@ -186,3 +190,7 @@ class ToolsInterface:
 
     def getToolsMode(self): #0- brush,1-colorpick , 2-brushpick ,3-eraser ,4-erasersize, 5-8: settings
         return self.interfaceImgIndex
+
+    def pickSave():
+        doSave = False
+        return doSave
