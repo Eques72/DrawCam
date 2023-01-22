@@ -1,10 +1,10 @@
 # DRAW CAM - Ai virtual painter
 **Application which lets you draw and write with your hands movement**
- - [x] Uses Mediapipe algorithms for hands recognision
- - [x] Requeries web cam to work
+ - [x] Uses Mediapipe algorithms for hands recognition
+ - [x] Requires web cam to work
  - [x] Allows for painting on top of your camera output with multiple tools
  - [X] Work with one or two hands
- - [ ] WIP: Has image to text frature. Converts letters which You draw to .txt
+ - [ ] WIP: Has image to text feature. Converts letters which You draw to .txt
  - [x] Friendly and simple interface
  
 # Usage:
@@ -20,7 +20,7 @@
 > - Save as text - any recognized letters on your canvas will be saved to .txt file
 
 ### Example
--
+[![example](resources/examples/example1.png)](https://github.com/Eques72/DrawCam/tree/master/resources/examples)
 
 ## Installation
 Install dependencies listed below. Copy this repo into one designated folder and run DrawCam.py

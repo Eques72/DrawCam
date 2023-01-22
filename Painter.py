@@ -1,5 +1,6 @@
 import cv2
 
+#Class handles logic behind using brush tool
 class Painter:
     __brush_sizes = [3,9,15]
     __colors = [(26,26,26,255),(255,255,255,255),(22,22,255,255),(55,128,0,255),(255,113,82,255),
@@ -18,7 +19,8 @@ class Painter:
         self.__SIZE_PICKER_ON = False
         pass
 
-    def paint(self, xy, image):
+    #Place a new brushstroke, connected to last location of brushstroke if it was done without picking up the brush (finger)
+    def paint(self, xy:tuple, image:cv2.Mat):
         if self.last_xy is None:
             image = cv2.circle(image, xy, self.brush_size, Painter.__colors[self.current_color], -1)
         else:
@@ -30,13 +32,13 @@ class Painter:
         self.last_xy = None
         pass
 
-    def changeColor(self, color_id = 0):
+    def changeColor(self, color_id:int = 0):
         self.lastUsedColor = self.current_color
         if color_id < 10 and color_id >= 0:
             self.current_color = color_id
         pass
 
-    def changeSize(self, size_id = 0):
+    def changeSize(self, size_id:int = 0):
         if size_id < 3 and size_id >= 0:
             self.brush_size = Painter.__brush_sizes[size_id]
         pass 
@@ -48,33 +50,25 @@ class Painter:
     def setMode(self, mode: int):
         if mode == 0:
             self.current_color = self.lastUsedColor
-            self.__ERASER_MODE = False
-            self.__PAINT_MODE = True
-            self.__COLOR_PICKER_ON = False
-            self.__SIZE_PICKER_ON = False
+            self.setNewBrushStates(False,True,False,False)
         elif mode == 1 and self.__PAINT_MODE == True:
-            self.__ERASER_MODE = False
-            self.__PAINT_MODE = True
-            self.__COLOR_PICKER_ON = True
-            self.__SIZE_PICKER_ON = False            
+            self.setNewBrushStates(False,True,True,False)
         elif mode == 2 and self.__PAINT_MODE == True:
-            self.__ERASER_MODE = False
-            self.__PAINT_MODE = True
-            self.__COLOR_PICKER_ON = False
-            self.__SIZE_PICKER_ON = True            
+            self.setNewBrushStates(False,True,False,True)  
         elif mode == 2 and self.__ERASER_MODE == True:
-            self.__ERASER_MODE = True
-            self.__PAINT_MODE = False
-            self.__COLOR_PICKER_ON = False
-            self.__SIZE_PICKER_ON = True                   
+            self.setNewBrushStates(True,False,False,True)
         elif mode == 3:
             if self.current_color != Painter.__eraserId:
                 self.lastUsedColor = self.current_color
             self.current_color = Painter.__eraserId
-            self.__ERASER_MODE = True
-            self.__PAINT_MODE = False
-            self.__COLOR_PICKER_ON = False
-            self.__SIZE_PICKER_ON = False        
+            self.setNewBrushStates(True,False,False,False)  
+        pass
+
+    def setNewBrushStates(self, eraser:bool=True,paint:bool=False,color_picker:bool=False,size_picker:bool=False)->None:
+        self.__ERASER_MODE = eraser
+        self.__PAINT_MODE = paint
+        self.__COLOR_PICKER_ON = color_picker
+        self.__SIZE_PICKER_ON = size_picker          
         pass
 
     def getEraserMode(self):

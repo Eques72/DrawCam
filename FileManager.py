@@ -1,8 +1,10 @@
 import os
 import cv2
 
+# Class handles proper saving of images and access/loading of resources
+# Tested on windows only
 class FileManager:
-    __rootPath = "" #specified if program will be released for instalation as an app
+    __rootPath = os.path.abspath(os.curdir)
     __resourcesPath = "resources"
     __savedImagesPath = "paintings"
     __savedTextPath = "notes"
@@ -10,12 +12,13 @@ class FileManager:
     def __init__(self) -> None:
         pass
 
-    def saveAsImg(self, image, isCamBacgroundOn = False, variantPath: str = "", fileName = "NewPainting1.png"):
+    #Save image. Use isCamBackgroundOn to display proper default name. Use variantPath to specify save location, Use fileName to name the image file 
+    def saveAsImg(self, image:cv2.Mat, isCamBackgroundOn = False, variantPath: str = "", fileName: str = "NewPainting1.png")->None:
         if False == os.path.isdir(FileManager.__savedImagesPath):
             self.__createDir("",FileManager.__savedImagesPath)
         
         takenFileNames = os.listdir(FileManager.__savedImagesPath)
-        if isCamBacgroundOn == False:
+        if isCamBackgroundOn == False:
             fileName = "NewPaintingTransp1.png"
         while fileName in takenFileNames:
             if fileName[len(fileName)-5].isdigit():
@@ -31,13 +34,14 @@ class FileManager:
             cv2.imwrite(variantPath + "/" + fileName, image)
         pass
 
-
-    def saveAsText(self, text: str, variantPath: str = ""):
+    #TODO
+    def saveAsText(self, text: str, variantPath: str = "")->None:
         pass
 
-    def loadResources(self):
+    #Loads resources necessary for program to work. 
+    def loadResources(self)->None:
         resList = []
-        if os.path.isdir( FileManager.__resourcesPath):
+        if os.path.isdir(FileManager.__resourcesPath):
             dirFiles = os.listdir(FileManager.__resourcesPath)
             for file in dirFiles:
                 resList.append(cv2.imread(f'{FileManager.__resourcesPath}/{file}', flags=cv2.IMREAD_UNCHANGED))
@@ -46,10 +50,10 @@ class FileManager:
             pass
         return resList
 
-    def __createDir(self, path = "", dirName = "NewFolder"):
+    def __createDir(self, path:str = "", dirName:str = "NewFolder")->None:
         if path != "":
             os.mkdir(path + "/" + dirName)
         else:
-            os.mkdir(dirName)
+            os.mkdir(FileManager.__rootPath + "/" + dirName)
         pass
 
